@@ -1,9 +1,16 @@
 package _03_To_Do_List;
 
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -22,13 +29,20 @@ public class ToDoList implements ActionListener {
 	JButton load = new JButton();
 	JButton aux = new JButton();
 	JButton cram = new JButton();
+	JButton clear = new JButton();
+	JButton delete = new JButton();
 	JTextField jetf = new JTextField();
+	Boolean lls = false;
+	boolean blank = false;
 	ArrayList<JButton> srblist = new ArrayList<JButton>();
+	ArrayList<JButton> jbl = new ArrayList<JButton>();
 	int state=0;
 	String sv="";
 	int count=0;
 	ArrayList<String> mlist = new ArrayList<String>();
-	JButton[] jbs = {add, view, remove, save, load};
+	JButton[] jbs = {add, view, remove, save, load, clear, delete};
+	ArrayList<String> loglist = new ArrayList<String>();
+	
 	public static void main(String[] args) {
 		new ToDoList().setup();	
 	}
@@ -56,9 +70,21 @@ public class ToDoList implements ActionListener {
 		remove.setText("remove");
 		save.setText("save");
 		load.setText("load");
+		clear.setText("clear");
+		delete.setText("delete save");
 		aux.setVisible(false);
 		
 		cram.setText("cram");
+		
+		logload();
+		if(!blank) {
+			saveload(loglist.get(loglist.size()-1));
+		}else {
+			JOptionPane.showMessageDialog(jeff, "No save was loaded");
+		}
+		
+		
+		
 		
 		
 	}
@@ -82,13 +108,81 @@ public class ToDoList implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if(e.getSource().equals(cram)) {
-			mlist.add("Homework");
-			mlist.add("Lunch");
-			mlist.add("Class");
-			mlist.add("Call");
-			mlist.add("Break");
+			mlist.add("Add clear list");
+			mlist.add("Make view into constant text");
+			mlist.add("Add clear save");
+			mlist.add("remove cram");
 			cram.setVisible(false);
 			e.setSource(view);
+		}
+		
+		if(e.getSource().equals(load)) {
+			Arrays.stream(jbs).forEach((x) -> x.setVisible(false));
+				
+				
+				for (int i = 0; i < loglist.size(); i++) {
+					jbl.add(i, new JButton());
+					jbl.get(i).setText(loglist.get(i));
+					jbl.get(i).setVisible(true);
+					jbl.get(i).addActionListener(this);
+					jepp.add(jbl.get(i));
+				}
+				
+				
+				}
+				
+				
+		if(e.getSource().equals(clear)) {
+			mlist.clear();
+			jeff.setTitle("tasks cleared");
+		}
+		
+		if(e.getSource().equals(save)) {
+			if(mlist.size()>0) {
+				try {
+					
+					
+					/*8if(loglist.size()>0) {
+						ArrayList<String> odl = new ArrayList<String>();
+						BufferedReader broutdating = new BufferedReader(new FileReader("src/_03_To_Do_List/"+loglist.get(loglist.size()-1)+".txt"));
+						String line = broutdating.readLine();
+						while(line != null){
+							odl.add(line);
+							line = broutdating.readLine();
+						}
+						FileWriter outdate = new FileWriter("src/_03_To_Do_List/"+loglist.get(loglist.size()-1)+".txt");
+						outdate.write(odl.get(0).substring(3));
+						for (int i = 1; i < odl.size(); i++) {
+							outdate.write("\n"+odl.get(i));
+						}
+						outdate.close();
+					}*/
+					
+					
+					String fname = JOptionPane.showInputDialog("Save name:");
+					FileWriter fw = new FileWriter("src/_03_To_Do_List/"+fname+".txt");
+					//fw.write("[l]");
+					fw.write(mlist.get(0));
+					for (int i = 1; i < mlist.size(); i++) {
+						fw.write("\n"+mlist.get(i));
+					}
+					fw.close();
+					loglist.add(fname);
+					FileWriter log = new FileWriter("src/_03_To_Do_List/save_log.txt");
+					log.write(loglist.get(0));
+					for (int i = 1; i < loglist.size(); i++) {
+						log.write("\n"+loglist.get(i));
+					}
+					log.close();
+					jeff.setTitle(fname + " / saved");
+				} catch (HeadlessException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
 		}
 		
 		if(e.getSource().equals(add)) {
@@ -131,9 +225,21 @@ public class ToDoList implements ActionListener {
 				rbclear(srblist.get(i));
 			}
 		}
+		for (int i = 0; i < jbl.size(); i++) {
+			if(e.getSource().equals(jbl.get(i))) {
+				saveload(jbl.get(i).getText());
+				Arrays.stream(jbs).forEach((x) -> x.setVisible(true));
+				jbl.stream().forEach((x) -> x.setVisible(false));
+				jbl.clear();
+			}
+		
+			}
+		
 			
 		}
 	}
+	
+	
 	
 	
 	public String svs() {
@@ -160,4 +266,46 @@ public class ToDoList implements ActionListener {
 		srblist.stream().forEach((x) -> x.setVisible(false));
 		Arrays.stream(jbs).forEach((x) -> x.setVisible(true));
 	}
+	
+	public void saveload(String save) {
+		jeff.setTitle(save +" / loaded");
+		try {
+			BufferedReader load = new BufferedReader(new FileReader("src/_03_To_Do_List/"+save+".txt"));
+			mlist.clear();
+			String line = load.readLine();
+			while(line != null){
+				mlist.add(line);
+				line = load.readLine();
+			}
+			if(mlist.size()>0) {
+				
+				JOptionPane.showMessageDialog(jeff, svs());
+				}else {
+					JOptionPane.showMessageDialog(jeff, "No events were loaded");
+				}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
+	
+	public void logload() {
+		blank=true;
+		BufferedReader brsave;
+		try {
+			brsave = new BufferedReader(new FileReader("src/_03_To_Do_List/save_log.txt"));
+			String line = brsave.readLine();
+		while(line != null){
+			blank=false;
+			loglist.add(line);
+			line = brsave.readLine();
+		}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 }
