@@ -14,6 +14,7 @@ import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -21,7 +22,9 @@ import javax.swing.JTextField;
 public class ToDoList implements ActionListener {
 	//* Create a program with five buttons, add task, view tasks, remove task, save list, and load list. 
 	JFrame  jeff = new JFrame();
+	JFrame teff = new JFrame();
 	JPanel  jepp = new JPanel();
+	JPanel tepp = new JPanel();
 	JButton add  = new JButton();
 	JButton view = new JButton();
 	JButton remove = new JButton();
@@ -31,6 +34,9 @@ public class ToDoList implements ActionListener {
 	JButton cram = new JButton();
 	JButton clear = new JButton();
 	JButton delete = new JButton();
+	boolean pop = false;
+	JLabel jejl = new JLabel("Nothing to do :)");
+	//JLabel jejl = new JLabel("<html>newtask<br/>Makeviewintoconstanttext<br/>Addclearsave<br/>removecram<br/>homework</html>");
 	JTextField jetf = new JTextField();
 	Boolean lls = false;
 	boolean blank = false;
@@ -47,10 +53,12 @@ public class ToDoList implements ActionListener {
 		new ToDoList().setup();	
 	}
 	void setup() {
-		jepp.add(cram);
+		//jepp.add(cram);
+		
 		jepp.add(jetf);
 		jepp.add(aux);
 		Arrays.stream(jbs).forEach((b) -> jepp.add(b));
+		jepp.add(jejl);
 		jeff.add(jepp);
 		
 		jeff.pack();
@@ -66,7 +74,7 @@ public class ToDoList implements ActionListener {
 		
 		jetf.setVisible(false);
 		add.setText("add");
-		view.setText("view");
+		view.setText("pop text");
 		remove.setText("remove");
 		save.setText("save");
 		load.setText("load");
@@ -108,17 +116,18 @@ public class ToDoList implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		if(e.getSource().equals(cram)) {
-			mlist.add("Add clear list");
-			mlist.add("Make view into constant text");
-			mlist.add("Add clear save");
-			mlist.add("remove cram");
+			specadd("Add clear list");
+			specadd("Make view into constant text");
+			specadd("Add clear save");
+			specadd("remove cram");
 			cram.setVisible(false);
 			e.setSource(view);
 		}
 		
 		if(e.getSource().equals(load)) {
+			state=11;
 			Arrays.stream(jbs).forEach((x) -> x.setVisible(false));
-				
+			jejl.setVisible(false);
 				
 				for (int i = 0; i < loglist.size(); i++) {
 					jbl.add(i, new JButton());
@@ -127,39 +136,50 @@ public class ToDoList implements ActionListener {
 					jbl.get(i).addActionListener(this);
 					jepp.add(jbl.get(i));
 				}
+				teff.pack();
 				
+				jeff.pack();
 				
 				}
 				
-				
+		if(e.getSource().equals(delete)) {
+			state=12;
+			Arrays.stream(jbs).forEach((x) -> x.setVisible(false));
+			jejl.setVisible(false);
+			
+			for (int i = 0; i < loglist.size(); i++) {
+				jbl.add(i, new JButton());
+				jbl.get(i).setText(loglist.get(i));
+				jbl.get(i).setVisible(true);
+				jbl.get(i).addActionListener(this);
+				jepp.add(jbl.get(i));
+			}
+			
+			teff.pack();
+			jeff.pack();
+			
+			
+		}
+		
 		if(e.getSource().equals(clear)) {
 			mlist.clear();
 			jeff.setTitle("tasks cleared");
+			jejl.setText("Nothing to do, anymore ;)");
+			teff.pack();
+			jeff.pack();
 		}
 		
 		if(e.getSource().equals(save)) {
 			if(mlist.size()>0) {
 				try {
 					
-					
-					/*8if(loglist.size()>0) {
-						ArrayList<String> odl = new ArrayList<String>();
-						BufferedReader broutdating = new BufferedReader(new FileReader("src/_03_To_Do_List/"+loglist.get(loglist.size()-1)+".txt"));
-						String line = broutdating.readLine();
-						while(line != null){
-							odl.add(line);
-							line = broutdating.readLine();
-						}
-						FileWriter outdate = new FileWriter("src/_03_To_Do_List/"+loglist.get(loglist.size()-1)+".txt");
-						outdate.write(odl.get(0).substring(3));
-						for (int i = 1; i < odl.size(); i++) {
-							outdate.write("\n"+odl.get(i));
-						}
-						outdate.close();
-					}*/
-					
-					
 					String fname = JOptionPane.showInputDialog("Save name:");
+					if(fname==null) {
+						JOptionPane.showMessageDialog(null, "Name not provided, save canceled");
+					}
+					else if(fname.equals("")) {
+						JOptionPane.showMessageDialog(null, "Name not provided, save canceled");
+					}else {
 					FileWriter fw = new FileWriter("src/_03_To_Do_List/"+fname+".txt");
 					//fw.write("[l]");
 					fw.write(mlist.get(0));
@@ -175,7 +195,9 @@ public class ToDoList implements ActionListener {
 					}
 					log.close();
 					jeff.setTitle(fname + " / saved");
-				} catch (HeadlessException e1) {
+				}
+				}
+				 catch (HeadlessException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (IOException e1) {
@@ -187,23 +209,50 @@ public class ToDoList implements ActionListener {
 		
 		if(e.getSource().equals(add)) {
 			Arrays.stream(jbs).forEach((b) -> b.setVisible(false));
+			jejl.setVisible(false);
+			
 			jetf.setText("event name");
 			jetf.setVisible(true);
 			aux.setText("enter");
 			aux.setVisible(true);
 			state=1;
+			teff.pack();
+			
+			jeff.pack();
 		}
 		if(e.getSource().equals(view)) {
-			if(mlist.size()>0) {
+			pop=!pop;
+			/*if(mlist.size()>0) {
 			JOptionPane.showMessageDialog(jeff, svs());
 			}else {
 				JOptionPane.showMessageDialog(jeff, "No events were added");
+			}*/
+			if(pop) {
+			tepp.add(jejl);
+			teff.add(tepp);
+			teff.pack();
+			teff.setVisible(true);
+			teff.pack();
+			
+			jeff.pack();
+			}
+			else {
+				teff.setVisible(false);
+				jepp.add(jejl);
+				teff.pack();
+				
+				jeff.pack();
 			}
 		}
 		if(e.getSource().equals(remove)) {
 			if(mlist.size()>0) {
 				Arrays.stream(jbs).forEach((x) -> x.setVisible(false));
+				jejl.setVisible(false);
+				teff.pack();
+				
+				jeff.pack();
 				srb();
+				specadd("<1534>whatareyoudoing<235683>");
 			}else {
 				JOptionPane.showMessageDialog(jeff, "No events to remove");
 			}
@@ -214,9 +263,15 @@ public class ToDoList implements ActionListener {
 				String addfield = jetf.getText();
 				jeff.setTitle(addfield + " / added");
 				Arrays.stream(jbs).forEach((b) -> b.setVisible(true));
+				jejl.setVisible(true);
+				teff.pack();
+				
+				jeff.pack();
 				aux.setVisible(false);
 				jetf.setVisible(false);
-				mlist.add(addfield);
+				specadd(addfield);
+				//<html>test<br/>test2</html>
+				
 			}
 			
 		}
@@ -226,10 +281,46 @@ public class ToDoList implements ActionListener {
 			}
 		}
 		for (int i = 0; i < jbl.size(); i++) {
+			
+			
 			if(e.getSource().equals(jbl.get(i))) {
+				if(state==11) {
 				saveload(jbl.get(i).getText());
-				Arrays.stream(jbs).forEach((x) -> x.setVisible(true));
+			}
+				if(state==12) {
+					String mem = loglist.get(i);
+					loglist.remove(i);
+					
+					int k;
+					try {
+						FileWriter log = new FileWriter("src/_03_To_Do_List/save_log.txt");
+						if(i!=0) {
+						log.write(loglist.get(0));
+						k=1;
+						}else {
+							log.write(loglist.get(1));
+							k=2;
+						}
+						for (int j=k; j < loglist.size(); j++) {
+						log.write("\n"+loglist.get(j));
+						}
+					log.close();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					
+					
+					
+					jeff.setTitle(mem + " / deleted");
+				}
+Arrays.stream(jbs).forEach((x) -> x.setVisible(true));
+				
+				jejl.setVisible(true);
 				jbl.stream().forEach((x) -> x.setVisible(false));
+				teff.pack();
+				
+				jeff.pack();
 				jbl.clear();
 			}
 		
@@ -265,6 +356,11 @@ public class ToDoList implements ActionListener {
 		mlist.remove(jb.getText());
 		srblist.stream().forEach((x) -> x.setVisible(false));
 		Arrays.stream(jbs).forEach((x) -> x.setVisible(true));
+		jejl.setVisible(true);
+		teff.pack();
+		
+		jeff.pack();
+		specadd("<1534>whatareyoudoing<235683>");
 	}
 	
 	public void saveload(String save) {
@@ -274,15 +370,13 @@ public class ToDoList implements ActionListener {
 			mlist.clear();
 			String line = load.readLine();
 			while(line != null){
-				mlist.add(line);
+				specadd(line);
 				line = load.readLine();
 			}
-			if(mlist.size()>0) {
-				
-				JOptionPane.showMessageDialog(jeff, svs());
-				}else {
+			if(mlist.size()<1) {
 					JOptionPane.showMessageDialog(jeff, "No events were loaded");
-				}
+			}
+				
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -305,6 +399,23 @@ public class ToDoList implements ActionListener {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	public void specadd (String s) {
+		if(!s.equals("<1534>whatareyoudoing<235683>")) {
+		mlist.add(s);
+		}if(mlist.size()!=0) {
+		String jejlsettext="<html>1. "+mlist.get(0);
+		for (int i = 1; i < mlist.size(); i++) {
+			jejlsettext+="<br/><br/>"+i+". "+mlist.get(i);
+		}
+		jejlsettext+="</html>";
+		System.out.println(jejlsettext);
+		jejl.setText(jejlsettext);
+		System.out.println("dgdfgsg"+mlist);
+		teff.pack();
+		jeff.pack();
+		teff.setTitle(mlist.size()+" tasks remaining");
 		}
 	}
 	
