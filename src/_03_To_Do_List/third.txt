@@ -1,0 +1,3 @@
+Make view into constant text
+Add clear save
+remove cram

@@ -34,6 +34,8 @@ public class ToDoList implements ActionListener {
 	JButton cram = new JButton();
 	JButton clear = new JButton();
 	JButton delete = new JButton();
+	int clearc=0;
+	boolean cancel = false;
 	boolean pop = false;
 	JLabel jejl = new JLabel("Nothing to do :)");
 	//JLabel jejl = new JLabel("<html>newtask<br/>Makeviewintoconstanttext<br/>Addclearsave<br/>removecram<br/>homework</html>");
@@ -79,7 +81,7 @@ public class ToDoList implements ActionListener {
 		save.setText("save");
 		load.setText("load");
 		clear.setText("clear");
-		delete.setText("delete save");
+		delete.setText("delete saves");
 		aux.setVisible(false);
 		
 		cram.setText("cram");
@@ -125,6 +127,9 @@ public class ToDoList implements ActionListener {
 		}
 		
 		if(e.getSource().equals(load)) {
+			aux.setVisible(true);
+			aux.setText("<cancel>");
+			cancel=true;
 			state=11;
 			Arrays.stream(jbs).forEach((x) -> x.setVisible(false));
 			jejl.setVisible(false);
@@ -143,6 +148,9 @@ public class ToDoList implements ActionListener {
 				}
 				
 		if(e.getSource().equals(delete)) {
+			aux.setVisible(true);
+			aux.setText("<cancel>");
+			cancel=true;
 			state=12;
 			Arrays.stream(jbs).forEach((x) -> x.setVisible(false));
 			jejl.setVisible(false);
@@ -162,11 +170,31 @@ public class ToDoList implements ActionListener {
 		}
 		
 		if(e.getSource().equals(clear)) {
+			if(clearc==3) {
+				clearc=0;
+			}
+			if(clearc==1) {
 			mlist.clear();
 			jeff.setTitle("tasks cleared");
 			jejl.setText("Nothing to do, anymore ;)");
-			teff.pack();
-			jeff.pack();
+			
+			aux.setVisible(false);
+			Arrays.stream(jbs).forEach((x) -> x.setVisible(true));
+			jejl.setVisible(true);
+			clear.setText("clear");
+			clearc=3;
+			specadd("<1534>whatareyoudoing<235683>");
+			}
+			if(clearc==0) {
+			Arrays.stream(jbs).forEach((x) -> x.setVisible(false));
+			jejl.setVisible(false);
+			cancel=true;
+			aux.setVisible(true);
+			aux.setText("<cancel wipe>");
+			clear.setText("wipe save");
+			clear.setVisible(true);
+			clearc=1;}
+			
 		}
 		
 		if(e.getSource().equals(save)) {
@@ -175,10 +203,11 @@ public class ToDoList implements ActionListener {
 					
 					String fname = JOptionPane.showInputDialog("Save name:");
 					if(fname==null) {
-						JOptionPane.showMessageDialog(null, "Name not provided, save canceled");
+						jeff.setTitle("save canceled / no name provided");
 					}
 					else if(fname.equals("")) {
-						JOptionPane.showMessageDialog(null, "Name not provided, save canceled");
+						jeff.setTitle("save canceled / no name provided");
+						
 					}else {
 					FileWriter fw = new FileWriter("src/_03_To_Do_List/"+fname+".txt");
 					//fw.write("[l]");
@@ -204,21 +233,29 @@ public class ToDoList implements ActionListener {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+			}else {
+				JOptionPane.showMessageDialog(jeff, "What are you trying to save");
 			}
 		}
 		
 		if(e.getSource().equals(add)) {
-			Arrays.stream(jbs).forEach((b) -> b.setVisible(false));
-			jejl.setVisible(false);
+			String addfield = JOptionPane.showInputDialog("event name");
+			if(addfield == null || addfield.isEmpty()) {
+				jeff.setTitle("add canceled / no input");
+			}else {
+			jeff.setTitle(addfield + " / added");
+			specadd(addfield);}
+		//	Arrays.stream(jbs).forEach((b) -> b.setVisible(false));
+		//	jejl.setVisible(false);
 			
-			jetf.setText("event name");
-			jetf.setVisible(true);
-			aux.setText("enter");
-			aux.setVisible(true);
-			state=1;
-			teff.pack();
+		//	jetf.setText("event name");
+		////	jetf.setVisible(true);
+		//	aux.setText("enter");
+		//	aux.setVisible(true);
+		//	state=1;
+		//	teff.pack();
 			
-			jeff.pack();
+		//	jeff.pack();
 		}
 		if(e.getSource().equals(view)) {
 			pop=!pop;
@@ -245,6 +282,9 @@ public class ToDoList implements ActionListener {
 			}
 		}
 		if(e.getSource().equals(remove)) {
+			aux.setVisible(true);
+			aux.setText("<Cancel>");
+			cancel=true;
 			if(mlist.size()>0) {
 				Arrays.stream(jbs).forEach((x) -> x.setVisible(false));
 				jejl.setVisible(false);
@@ -255,11 +295,12 @@ public class ToDoList implements ActionListener {
 				specadd("<1534>whatareyoudoing<235683>");
 			}else {
 				JOptionPane.showMessageDialog(jeff, "No events to remove");
+				aux.setVisible(false);
 			}
 		}
 		if(e.getSource().equals(aux)) {
 			System.out.println(state);
-			if(state==1) {
+		/*	if(state==1) {
 				String addfield = jetf.getText();
 				jeff.setTitle(addfield + " / added");
 				Arrays.stream(jbs).forEach((b) -> b.setVisible(true));
@@ -272,8 +313,21 @@ public class ToDoList implements ActionListener {
 				specadd(addfield);
 				//<html>test<br/>test2</html>
 				
+			}*/
+			if(cancel) {
+				srblist.stream().forEach((x) -> x.setVisible(false));
+				jbl.stream().forEach((x) -> x.setVisible(false));
+				Arrays.stream(jbs).forEach((x) -> x.setVisible(true));
+				jejl.setVisible(true);
+				teff.pack();
+				clear.setText("clear");
+				jeff.pack();
+				cancel=false;
+				aux.setVisible(false);
+				clearc=0;
+				
+				specadd("<1534>whatareyoudoing<235683>");
 			}
-			
 		}
 		else {for (int i = 0; i < srblist.size(); i++) {
 			if(e.getSource().equals(srblist.get(i))) {
@@ -357,9 +411,10 @@ Arrays.stream(jbs).forEach((x) -> x.setVisible(true));
 		srblist.stream().forEach((x) -> x.setVisible(false));
 		Arrays.stream(jbs).forEach((x) -> x.setVisible(true));
 		jejl.setVisible(true);
+		aux.setVisible(false);
 		teff.pack();
-		
 		jeff.pack();
+		System.out.println("sent");
 		specadd("<1534>whatareyoudoing<235683>");
 	}
 	
@@ -404,18 +459,25 @@ Arrays.stream(jbs).forEach((x) -> x.setVisible(true));
 	public void specadd (String s) {
 		if(!s.equals("<1534>whatareyoudoing<235683>")) {
 		mlist.add(s);
+		
 		}if(mlist.size()!=0) {
 		String jejlsettext="<html>1. "+mlist.get(0);
 		for (int i = 1; i < mlist.size(); i++) {
 			jejlsettext+="<br/><br/>"+i+". "+mlist.get(i);
 		}
 		jejlsettext+="</html>";
-		System.out.println(jejlsettext);
+		//System.out.println(jejlsettext);
 		jejl.setText(jejlsettext);
-		System.out.println("dgdfgsg"+mlist);
+		//System.out.println("te"+mlist);
 		teff.pack();
 		jeff.pack();
 		teff.setTitle(mlist.size()+" tasks remaining");
+		System.out.println(mlist.size());
+		}else {
+			jejl.setText("Nothing to do, anymore ;)");
+			teff.pack();
+			jeff.pack();
+			teff.setTitle("fin.");
 		}
 	}
 	
